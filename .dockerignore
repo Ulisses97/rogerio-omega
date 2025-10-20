@@ -1,0 +1,48 @@
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Documentação
+README.md
+*.md
+CHANGELOG_DOCKER.md
+GUIA_TESTE_RAPIDO.md
+RESUMO_ALTERACOES.md
+
+# Ambiente
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Build
+dist
+build
+
+# Testes (coverage)
+coverage
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporários
+*.log
+*.tmp
+

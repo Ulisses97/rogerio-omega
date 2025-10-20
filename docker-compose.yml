@@ -1,9 +1,12 @@
 version: '3.8'
 
 services:
+  # ====================
+  # BANCO DE DADOS
+  # ====================
   postgres:
     image: postgres:16-alpine
-    container_name: teste-omega
+    container_name: omega-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: omega_user
@@ -13,9 +16,68 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-test-db.sh:/docker-entrypoint-initdb.d/init-test-db.sh
     networks:
       - omega-network
-    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U omega_user -d omega_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ====================
+  # APLICAÇÃO (PRODUÇÃO)
+  # ====================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: omega-app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: omega_db
+      DB_USER: omega_user
+      DB_PASSWORD: omega_password
+      JWT_SECRET: your-secret-key-here-change-in-production
+      JWT_EXPIRES_IN: 24h
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - omega-network
+
+  # ====================
+  # TESTES
+  # ====================
+  test:
+    profiles: ["test"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    container_name: omega-tests
+    environment:
+      NODE_ENV: test
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: omega_db_test
+      DB_USER: omega_user
+      DB_PASSWORD: omega_password
+      JWT_SECRET: test-secret-key
+      JWT_EXPIRES_IN: 1h
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - omega-network
+    command: npm test
 
 volumes:
   postgres_data:

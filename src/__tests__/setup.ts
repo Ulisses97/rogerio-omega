@@ -1,4 +1,6 @@
 import { pool } from "../database/connection";
+import * as fs from "fs";
+import * as path from "path";
 
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET = "test-secret-key";
@@ -10,17 +12,29 @@ global.console = {
   info: jest.fn(),
 };
 
-// Hook que executa antes de todos os testes
 beforeAll(async () => {
-  // Aguarda a conexão com o banco estar pronta
   await pool.query("SELECT 1");
-  // Limpa o banco uma vez no início de todos os testes
+
+  try {
+    const migrationFile = path.join(
+      __dirname,
+      "../database/migrations/001_create_users_table.sql"
+    );
+    const sql = fs.readFileSync(migrationFile, "utf-8");
+    await pool.query(sql);
+  } catch (error: any) {
+    if (
+      !error.message?.includes("already exists") &&
+      !error.message?.includes("duplicate key")
+    ) {
+      throw error;
+    }
+  }
+
   await pool.query("TRUNCATE TABLE users RESTART IDENTITY CASCADE");
 });
 
-// Hook que executa depois de todos os testes
 afterAll(async () => {
-  // Limpa o banco e fecha a conexão
   await pool.query("TRUNCATE TABLE users RESTART IDENTITY CASCADE");
   await pool.end();
 });

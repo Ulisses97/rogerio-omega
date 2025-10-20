@@ -10,7 +10,6 @@ describe("User Routes", () => {
   let testUserId: number;
   let testUserToken: string;
 
-  // Limpa o banco antes desta suite de testes
   beforeAll(async () => {
     await pool.query("TRUNCATE TABLE users RESTART IDENTITY CASCADE");
 

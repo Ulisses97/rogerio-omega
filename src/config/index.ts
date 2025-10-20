@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 
-dotenv.config();
-
-const isTestEnvironment = process.env.NODE_ENV === "test";
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config();
+}
 
 export const config = {
   port: process.env.PORT,
@@ -11,10 +11,7 @@ export const config = {
   database: {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : undefined,
-    // Use banco de dados separado para testes
-    database: isTestEnvironment
-      ? process.env.DB_TEST_NAME || `${process.env.DB_NAME}_test`
-      : process.env.DB_NAME,
+    database: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
   },

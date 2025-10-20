@@ -6,7 +6,6 @@ describe("Auth Routes", () => {
   let createdUserEmail: string;
   let createdUserToken: string;
 
-  // Limpa o banco antes de cada suite de testes de autenticação
   beforeAll(async () => {
     await pool.query("TRUNCATE TABLE users RESTART IDENTITY CASCADE");
   });
