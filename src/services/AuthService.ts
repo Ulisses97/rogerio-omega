@@ -34,8 +34,6 @@ export class AuthService {
       throw new Error("Esse email já foi registrado");
     }
 
-    this.validateUserData(userData);
-
     const password_hash = await bcrypt.hash(userData.password, this.saltRounds);
 
     const user = await this.userRepository.create({
@@ -77,7 +75,7 @@ export class AuthService {
   private generateToken(userId: number): string {
     const secret = config.jwt.secret;
     if (!secret) {
-      throw new Error("credenciais de autenticação não configuradas");
+      throw new Error("Credenciais de autenticação não configuradas");
     }
 
     return jwt.sign({ userId }, secret, {
@@ -85,29 +83,10 @@ export class AuthService {
     } as jwt.SignOptions);
   }
 
-  private validateUserData(userData: CreateUserDTO): void {
-    if (!userData.name || userData.name.trim().length < 2) {
-      throw new Error("Name must be at least 2 characters long");
-    }
-
-    if (!this.isValidEmail(userData.email)) {
-      throw new Error("Invalid email format");
-    }
-
-    if (!userData.password || userData.password.length < 6) {
-      throw new Error("Password must be at least 6 characters long");
-    }
-  }
-
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-
   verifyToken(token: string): { userId: number } {
     const secret = config.jwt.secret;
     if (!secret) {
-      throw new Error("credenciais de autenticação não configuradas");
+      throw new Error("Credenciais de autenticação não configuradas");
     }
 
     try {
@@ -116,7 +95,7 @@ export class AuthService {
       };
       return decoded;
     } catch (error) {
-      throw new Error("Invalid token");
+      throw new Error("Token inválido");
     }
   }
 }
