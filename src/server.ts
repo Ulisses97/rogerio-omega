@@ -16,8 +16,10 @@ const PORT = config.port || 3000;
 
 app.use("/api", routes);
 
-app.listen(PORT, () => {
-  console.log(`servidor on na porta: ${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`servidor on na porta: ${PORT}`);
+  });
+}
 
 export default app;

@@ -28,25 +28,3 @@ export const query = async (text: string, params?: any[]) => {
     throw error;
   }
 };
-
-export const getClient = async () => {
-  const client = await pool.connect();
-  const originalQuery = client.query;
-  const originalRelease = client.release;
-
-  // Set a timeout of 5 seconds, after which we will log this client's last query
-  const timeout = setTimeout(() => {
-    console.error("A client has been checked out for more than 5 seconds!");
-  }, 5000);
-
-  // Override release to clear timeout
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (client as any).release = () => {
-    clearTimeout(timeout);
-    client.query = originalQuery;
-    client.release = originalRelease;
-    return originalRelease.apply(client);
-  };
-
-  return client;
-};
