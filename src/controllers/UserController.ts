@@ -27,4 +27,17 @@ export class UserController {
       throw error;
     }
   }
+
+  async getUsers(req: AuthRequest, res: Response) {
+    try {
+      const users = await userRepository.findAll();
+      const usersWithoutPasswords = users.map(
+        ({ password_hash, ...user }) => user
+      );
+      return res.status(200).json(usersWithoutPasswords);
+    } catch (error: any) {
+      res.status(500);
+      throw error;
+    }
+  }
 }
